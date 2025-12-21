@@ -7,7 +7,7 @@ public class Dish {
     private int id;
     private String name;
     private DishTypeEnum dishType;
-    private List<Ingredient> ingredients;  // Liste des ingrédients
+    private List<Ingredient> ingredients;
 
     public Dish() {
         this.ingredients = new ArrayList<>();
@@ -85,4 +85,5 @@ public class Dish {
                 ", ingredients=" + ingredients +
                 ", dishPrice=" + getDishPrice() +
                 '}';
+    }
 }

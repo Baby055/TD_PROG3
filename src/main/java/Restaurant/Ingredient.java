@@ -3,20 +3,22 @@ package Restaurant;
 public class Ingredient {
     private int id;
     private String name;
-    private double price;  // ou BigDecimal pour plus de précision
-    private IngredientCategoryEnum category;
-    private int dishId;  // Référence au plat
+    private Double price;
+    private CategoryEnum category;
+    private Dish dish;
 
+    // Constructeurs
     public Ingredient() {}
 
-    public Ingredient(int id, String name, double price, IngredientCategoryEnum category, int dishId) {
+    public Ingredient(int id, String name, Double price, CategoryEnum category, Dish dish) {
         this.id = id;
         this.name = name;
         this.price = price;
         this.category = category;
-        this.dishId = dishId;
+        this.dish = dish;
     }
 
+    // Getters et Setters
     public int getId() {
         return id;
     }
@@ -33,28 +35,36 @@ public class Ingredient {
         this.name = name;
     }
 
-    public double getPrice() {
+    public Double getPrice() {
         return price;
     }
 
-    public void setPrice(double price) {
+    public void setPrice(Double price) {
         this.price = price;
     }
 
-    public IngredientCategoryEnum getCategory() {
+    public CategoryEnum getCategory() {
         return category;
     }
 
-    public void setCategory(IngredientCategoryEnum category) {
+    public void setCategory(CategoryEnum category) {
         this.category = category;
     }
 
-    public int getDishId() {
-        return dishId;
+    public Dish getDish() {
+        return dish;
     }
 
-    public void setDishId(int dishId) {
-        this.dishId = dishId;
+    public void setDish(Dish dish) {
+        this.dish = dish;
+    }
+
+    public String getDishName() {
+        if (dish != null) {
+            return dish.getName();
+        } else {
+            return "Aucun plat";
+        }
     }
 
     @Override
@@ -64,7 +74,7 @@ public class Ingredient {
                 ", name='" + name + '\'' +
                 ", price=" + price +
                 ", category=" + category +
-                ", dishId=" + dishId +
+                ", dish=" + (dish != null ? dish.getName() : "null") +
                 '}';
     }
 }
