@@ -74,14 +74,14 @@ public class Dish {
             this.ingredients = new ArrayList<>();
         }
         this.ingredients.add(ingredient);
-        ingredient.setDish(this);  // Mettre à jour la référence bidirectionnelle
+        ingredient.setDish(this);
     }
 
     public boolean removeIngredient(Ingredient ingredient) {
         if (this.ingredients != null) {
             boolean removed = this.ingredients.remove(ingredient);
             if (removed) {
-                ingredient.setDish(null);  // Retirer la référence
+                ingredient.setDish(null);
             }
             return removed;
         }
