@@ -8,7 +8,7 @@ public class Dish {
     private String name;
     private DishTypeEnum dishType;
     private List<Ingredient> ingredients;
-
+    
     public Dish() {
         this.ingredients = new ArrayList<>();
     }
@@ -20,6 +20,7 @@ public class Dish {
         this.dishType = dishType;
     }
 
+    // Getters et Setters
     public int getId() {
         return id;
     }
@@ -50,15 +51,21 @@ public class Dish {
 
     public void setIngredients(List<Ingredient> ingredients) {
         this.ingredients = ingredients;
+        // Mettre à jour la référence au plat pour chaque ingrédient
+        if (ingredients != null) {
+            for (Ingredient ingredient : ingredients) {
+                ingredient.setDish(this);
+            }
+        }
     }
 
-    public double getDishPrice() {
+    public Double getDishPrice() {
         if (ingredients == null || ingredients.isEmpty()) {
             return 0.0;
         }
 
         return ingredients.stream()
-                .mapToDouble(Ingredient::getPrice)
+                .mapToDouble(ingredient -> ingredient.getPrice() != null ? ingredient.getPrice() : 0.0)
                 .sum();
     }
 
@@ -67,11 +74,16 @@ public class Dish {
             this.ingredients = new ArrayList<>();
         }
         this.ingredients.add(ingredient);
+        ingredient.setDish(this);  // Mettre à jour la référence bidirectionnelle
     }
 
     public boolean removeIngredient(Ingredient ingredient) {
         if (this.ingredients != null) {
-            return this.ingredients.remove(ingredient);
+            boolean removed = this.ingredients.remove(ingredient);
+            if (removed) {
+                ingredient.setDish(null);  // Retirer la référence
+            }
+            return removed;
         }
         return false;
     }
@@ -82,7 +94,7 @@ public class Dish {
                 "id=" + id +
                 ", name='" + name + '\'' +
                 ", dishType=" + dishType +
-                ", ingredients=" + ingredients +
+                ", ingredients=" + (ingredients != null ? ingredients.size() : 0) +
                 ", dishPrice=" + getDishPrice() +
                 '}';
     }
