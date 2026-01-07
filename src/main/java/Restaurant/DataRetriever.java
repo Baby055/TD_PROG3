@@ -8,7 +8,7 @@ public class DataRetriever {
 
     public Dish findDishById(Integer id) {
         String dishQuery = "SELECT * FROM Dish WHERE id = ?";
-        String ingredientsQuery = "SELECT * FROM Ingredient WHERE dish_id = ?";
+        String ingredientsQuery = "SELECT * FROM Ingredient WHERE id_dish = ?";
 
         try (Connection conn = DBConnection.getDBConnection();
              PreparedStatement dishStmt = conn.prepareStatement(dishQuery);
@@ -17,7 +17,9 @@ public class DataRetriever {
             dishStmt.setInt(1, id);
             ResultSet dishRs = dishStmt.executeQuery();
 
-            if (!dishRs.next()) return null;
+            if (!dishRs.next()) {
+                throw new RuntimeException("Plat introuvable avec l'ID : " + id);
+            }
 
             Dish dish = new Dish(
                     dishRs.getInt("id"),
@@ -35,7 +37,8 @@ public class DataRetriever {
                         ingRs.getString("name"),
                         ingRs.getDouble("price"),
                         CategoryEnum.valueOf(ingRs.getString("category")),
-                        dish
+                        dish,
+                        ingRs.getObject("required_quantity") != null ? ingRs.getDouble("required_quantity") : null
                 );
                 ingredients.add(ing);
             }
@@ -49,7 +52,7 @@ public class DataRetriever {
     }
 
     public List<Ingredient> findIngredients(int page, int size) {
-        String query = "SELECT * FROM Ingredient LIMIT ? OFFSET ?";
+        String query = "SELECT * FROM Ingredient LIMIT ? OFFSET ?"; // LIMIT : nombre maximumu d'ingrédients à récupérer , OFFSET : décalage (page * taille)
         List<Ingredient> ingredients = new ArrayList<>();
 
         try (Connection conn = DBConnection.getDBConnection();
@@ -65,7 +68,8 @@ public class DataRetriever {
                         rs.getString("name"),
                         rs.getDouble("price"),
                         CategoryEnum.valueOf(rs.getString("category")),
-                        null
+                        null,
+                        rs.getObject("required_quantity") != null ? rs.getDouble("required_quantity") : null
                 );
                 ingredients.add(ing);
             }
@@ -79,7 +83,7 @@ public class DataRetriever {
 
     public List<Ingredient> createIngredients(List<Ingredient> newIngredients) {
         String checkQuery = "SELECT COUNT(*) FROM Ingredient WHERE name = ?";
-        String insertQuery = "INSERT INTO Ingredient (name, price, category, dish_id) VALUES (?, ?, ?, ?)";
+        String insertQuery = "INSERT INTO Ingredient (name, price, category, id_dish, required_quantity) VALUES (?, ?, ?, ?, ?)";
 
         try (Connection conn = DBConnection.getDBConnection()) {
             conn.setAutoCommit(false);
@@ -90,19 +94,23 @@ public class DataRetriever {
                     ResultSet rs = checkStmt.executeQuery();
                     rs.next();
                     if (rs.getInt(1) > 0) {
-                        conn.rollback(); // Annule toute opération
+                        conn.rollback();
                         throw new RuntimeException("L'ingrédient existe déjà : " + ing.getName());
                     }
                 }
             }
 
-            // Insertion des ingrédients
             for (Ingredient ing : newIngredients) {
                 try (PreparedStatement insertStmt = conn.prepareStatement(insertQuery, Statement.RETURN_GENERATED_KEYS)) {
                     insertStmt.setString(1, ing.getName());
                     insertStmt.setDouble(2, ing.getPrice());
                     insertStmt.setString(3, ing.getCategory().name());
                     insertStmt.setObject(4, ing.getDish() != null ? ing.getDish().getId() : null);
+                    if (ing.getRequiredQuantity() != null) {
+                        insertStmt.setDouble(5, ing.getRequiredQuantity());
+                    } else {
+                        insertStmt.setNull(5, Types.NUMERIC);
+                    }
                     insertStmt.executeUpdate();
 
                     ResultSet keys = insertStmt.getGeneratedKeys();

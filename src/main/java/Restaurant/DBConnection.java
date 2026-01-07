@@ -5,20 +5,18 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 
 public class DBConnection {
+    private static final String JDBC_URL = "jdbc:postgresql://localhost:5432/mini_dish_db";
+    private static final String USERNAME = "mini_dish_db_manager";
+    private static final String PASSWORD = "password123";
 
     public static Connection getDBConnection() {
-        String jdbcUrl = System.getenv("jdbc:postgresql://localhost:5432/mini_dish_db");
-        String username = System.getenv("mini_dish_db_manager");
-        String password = System.getenv("password123");
-
-        if (jdbcUrl == null || username == null || password == null) {
-            throw new IllegalStateException("Les variables d’environnement JDBC_URL, USERNAME ou PASSWORD ne sont pas définies.");
-        }
-
         try {
-            return DriverManager.getConnection(jdbcUrl, username, password);
+            Connection conn = DriverManager.getConnection(JDBC_URL, USERNAME, PASSWORD);
+            System.out.println("✅ Connexion réussie à PostgreSQL !");
+            return conn;
         } catch (SQLException e) {
-            throw new RuntimeException("Erreur lors de la connexion à la base de données", e);
+            System.out.println("❌ Erreur lors de la connexion : " + e.getMessage());
+            throw new RuntimeException(e);
         }
     }
 }

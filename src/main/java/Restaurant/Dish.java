@@ -8,7 +8,7 @@ public class Dish {
     private String name;
     private DishTypeEnum dishType;
     private List<Ingredient> ingredients;
-    
+
     public Dish() {
         this.ingredients = new ArrayList<>();
     }
@@ -20,7 +20,6 @@ public class Dish {
         this.dishType = dishType;
     }
 
-    // Getters et Setters
     public int getId() {
         return id;
     }
@@ -51,7 +50,6 @@ public class Dish {
 
     public void setIngredients(List<Ingredient> ingredients) {
         this.ingredients = ingredients;
-        // Mettre à jour la référence au plat pour chaque ingrédient
         if (ingredients != null) {
             for (Ingredient ingredient : ingredients) {
                 ingredient.setDish(this);
@@ -59,14 +57,19 @@ public class Dish {
         }
     }
 
-    public Double getDishPrice() {
+    public Double getDishCost() {
         if (ingredients == null || ingredients.isEmpty()) {
             return 0.0;
         }
 
-        return ingredients.stream()
-                .mapToDouble(ingredient -> ingredient.getPrice() != null ? ingredient.getPrice() : 0.0)
-                .sum();
+        double total = 0.0;
+        for (Ingredient ingredient : ingredients) {
+            if (ingredient.getRequiredQuantity() == null) {
+                throw new RuntimeException("Quantité inconnue pour l'ingrédient: " + ingredient.getName());
+            }
+            total += ingredient.getPrice() * ingredient.getRequiredQuantity();
+        }
+        return total;
     }
 
     public void addIngredient(Ingredient ingredient) {
@@ -95,7 +98,7 @@ public class Dish {
                 ", name='" + name + '\'' +
                 ", dishType=" + dishType +
                 ", ingredients=" + (ingredients != null ? ingredients.size() : 0) +
-                ", dishPrice=" + getDishPrice() +
+                ", dishCost=" + getDishCost() +
                 '}';
     }
 }
