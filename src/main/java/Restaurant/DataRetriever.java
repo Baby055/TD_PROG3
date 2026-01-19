@@ -147,4 +147,16 @@ public class DataRetriever {
         }
         return list;
     }
+
+    public void saveDishIngredient(DishIngredient di) throws SQLException {
+        String sql = "INSERT INTO DishIngredient (id_dish, id_ingredient, quantity_required, unit) VALUES (?, ?, ?, ?)";
+        try (Connection conn = DBConnection.getDBConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, di.getDishId());
+            ps.setInt(2, di.getIngredientId());
+            ps.setDouble(3, di.getQuantityRequired());
+            ps.setString(4, di.getUnit().name());
+            ps.executeUpdate();
+        }
+    }
 }
