@@ -127,4 +127,24 @@ public class DataRetriever {
             throw new RuntimeException("Erreur lors de la création des ingrédients", e);
         }
     }
+
+    public List<DishIngredient> findDishIngredientsByDish(int dishId) throws SQLException {
+        String sql = "SELECT * FROM DishIngredient WHERE id_dish = ?";
+        List<DishIngredient> list = new ArrayList<>();
+        try (Connection conn = DBConnection.getDBConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, dishId);
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                list.add(new DishIngredient(
+                        rs.getInt("id"),
+                        rs.getInt("id_dish"),
+                        rs.getInt("id_ingredient"),
+                        rs.getDouble("quantity_required"),
+                        UnitType.valueOf(rs.getString("unit"))
+                ));
+            }
+        }
+        return list;
+    }
 }
