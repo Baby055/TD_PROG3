@@ -1,5 +1,8 @@
 package Restaurant;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class Ingredient {
     private int id;
     private String name;
@@ -7,6 +10,7 @@ public class Ingredient {
     private CategoryEnum category;
     private Dish dish;
     private Double requiredQuantity;
+    private List<StockMovement> stockMovementList; // Nouvel attribut
 
     public Ingredient(int id, String name, Double price, CategoryEnum category, Dish dish, Double requiredQuantity) {
         this.id = id;
@@ -15,6 +19,7 @@ public class Ingredient {
         this.category = category;
         this.dish = dish;
         this.requiredQuantity = requiredQuantity;
+        this.stockMovementList = new ArrayList<>(); // Initialisation
     }
 
     public int getId() { return id; }
@@ -34,6 +39,18 @@ public class Ingredient {
 
     public Double getRequiredQuantity() { return requiredQuantity; }
     public void setRequiredQuantity(Double requiredQuantity) { this.requiredQuantity = requiredQuantity; }
+
+    public List<StockMovement> getStockMovementList() { return stockMovementList; }
+    public void setStockMovementList(List<StockMovement> stockMovementList) {
+        this.stockMovementList = stockMovementList;
+    }
+
+    public void addStockMovement(StockMovement movement) {
+        if (stockMovementList == null) {
+            stockMovementList = new ArrayList<>();
+        }
+        stockMovementList.add(movement);
+    }
 
     public String getDishName() {
         return dish != null ? dish.getName() : "Aucun plat";
