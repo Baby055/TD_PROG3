@@ -10,7 +10,7 @@ public class Ingredient {
     private CategoryEnum category;
     private Dish dish;
     private Double requiredQuantity;
-    private List<StockMovement> stockMovementList; // Nouvel attribut
+    private List<StockMovement> stockMovementList;
 
     public Ingredient(int id, String name, Double price, CategoryEnum category, Dish dish, Double requiredQuantity) {
         this.id = id;

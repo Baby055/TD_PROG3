@@ -36,3 +36,11 @@ UPDATE Dish SET selling_price = 12000.00 WHERE id=2;
 UPDATE Dish SET selling_price = NULL WHERE id=3;
 UPDATE Dish SET selling_price = 8000.00 WHERE id=4;
 UPDATE Dish SET selling_price = NULL WHERE id=5;
+
+CREATE TABLE stock_movement (
+    id SERIAL PRIMARY KEY,
+    ingredient_id INT NOT NULL REFERENCES ingredient(id) ON DELETE CASCADE,
+    quantity DECIMAL(10,2) NOT NULL,
+    unit VARCHAR(10) DEFAULT 'KG',
+    movement_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);

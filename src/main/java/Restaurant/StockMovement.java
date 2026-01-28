@@ -6,7 +6,7 @@ public class StockMovement {
     private int id;
     private int ingredientId;
     private double quantity;
-    private String unit; // Pour l'instant toujours "KG"
+    private String unit;
     private LocalDateTime movementDate;
 
     public StockMovement(int id, int ingredientId, double quantity, String unit, LocalDateTime movementDate) {
@@ -17,7 +17,6 @@ public class StockMovement {
         this.movementDate = movementDate;
     }
 
-    // Getters et setters
     public int getId() { return id; }
     public void setId(int id) { this.id = id; }
 
