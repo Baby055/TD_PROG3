@@ -39,3 +39,14 @@ CREATE TABLE IF NOT EXISTS orders (
     id_sale INT UNIQUE NULL REFERENCES sale(id)
 );
 
+delete from dish-orders;
+delete from order;
+delete from sale;
+
+INSERT INTO orders (id, reference, creation_datetime, payment_status, id_sale) VALUES
+(1, '201', '2024-01-15 12:30:00', 'PAID', 1),
+(2, '202', '2024-01-16 13:45:00', 'UNPAID', NULL);
+
+INSERT INTO sale (id, creation_datetime) VALUES
+(1, '2024-01-15 12:30:00');
+
