@@ -56,5 +56,16 @@ public class Order {
     public void setSale(Sale sale) {
         this.sale = sale;
     }
+
+    @Override
+    public String toString() {
+        return "Order{" +
+                "id=" + id +
+                ", reference='" + reference + '\'' +
+                ", creationDatetime=" + creationDatetime +
+                ", paymentStatus=" + paymentStatus +
+                ", sale=" + (sale != null ? "Sale{id=" + sale.getId() + "}" : "null") +
+                '}';
+    }
 }
 

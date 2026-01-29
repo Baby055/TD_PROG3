@@ -26,5 +26,13 @@ public class Sale {
     public void setCreationDatetime(Instant creationDatetime) {
         this.creationDatetime = creationDatetime;
     }
+
+    @Override
+    public String toString() {
+        return "Sale{" +
+                "id=" + id +
+                ", creationDatetime=" + creationDatetime +
+                '}';
+    }
 }
 

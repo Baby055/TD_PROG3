@@ -8,13 +8,13 @@ EXCEPTION
     WHEN duplicate_object THEN NULL;
 END $$;
 
-CREATE TABLE IF NOT EXISTS Dish (
+CREATE TABLE Dish (
     id SERIAL PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
     dish_type dish_type_enum NOT NULL
 );
 
-CREATE TABLE IF NOT EXISTS Ingredient (
+CREATE TABLE Ingredient (
     id SERIAL PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
     price NUMERIC(10, 2) NOT NULL,
@@ -40,34 +40,14 @@ CREATE TABLE IF NOT EXISTS orders (
 );
 
 -- Nettoyage des données de test (si elles existent)
-DO $$
-BEGIN
-    IF EXISTS (SELECT FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'orders') THEN
-        DELETE FROM orders;
-    END IF;
-    IF EXISTS (SELECT FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'sale') THEN
-        DELETE FROM sale;
-    END IF;
-END $$;
+DELETE FROM orders;
+DELETE FROM sale;
 
 -- IMPORTANT: Insérer d'abord la vente, puis la commande qui la référence
--- Utilisation de DO $$ pour gérer les insertions de manière sécurisée
-DO $$
-BEGIN
-    -- Insérer la vente si elle n'existe pas déjà
-    IF NOT EXISTS (SELECT 1 FROM sale WHERE id = 1) THEN
-        INSERT INTO sale (id, creation_datetime) VALUES
-        (1, '2024-01-15 12:30:00');
-    END IF;
+INSERT INTO sale (id, creation_datetime) VALUES
+(1, '2024-01-15 12:30:00');
 
-    -- Insérer les commandes si elles n'existent pas déjà
-    IF NOT EXISTS (SELECT 1 FROM orders WHERE id = 1) THEN
-        INSERT INTO orders (id, reference, creation_datetime, payment_status, id_sale) VALUES
-        (1, '201', '2024-01-15 12:30:00', 'PAID', 1);
-    END IF;
+INSERT INTO orders (id, reference, creation_datetime, payment_status, id_sale) VALUES
+(1, '201', '2024-01-15 12:30:00', 'PAID', 1),
+(2, '202', '2024-01-16 13:45:00', 'UNPAID', NULL);
 
-    IF NOT EXISTS (SELECT 1 FROM orders WHERE id = 2) THEN
-        INSERT INTO orders (id, reference, creation_datetime, payment_status, id_sale) VALUES
-        (2, '202', '2024-01-16 13:45:00', 'UNPAID', NULL);
-    END IF;
-END $$;

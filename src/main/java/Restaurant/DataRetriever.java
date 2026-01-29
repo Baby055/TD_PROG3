@@ -175,7 +175,86 @@ public class DataRetriever {
         }
     }
 
+    /**
+     * Initialise les tables nécessaires si elles n'existent pas
+     */
+    public void initializeDatabaseIfNeeded() {
+        try (Connection conn = DBConnection.getDBConnection()) {
+            // Créer le type payment_status s'il n'existe pas
+            String createPaymentStatus = """
+                DO $$
+                BEGIN
+                    CREATE TYPE payment_status AS ENUM ('PAID', 'UNPAID');
+                EXCEPTION
+                    WHEN duplicate_object THEN NULL;
+                END $$;
+                """;
+            
+            try (Statement stmt = conn.createStatement()) {
+                stmt.execute(createPaymentStatus);
+            }
+
+            // Créer la table sale si elle n'existe pas
+            String createSaleTable = """
+                CREATE TABLE IF NOT EXISTS sale (
+                    id SERIAL PRIMARY KEY,
+                    creation_datetime TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+                );
+                """;
+            
+            try (Statement stmt = conn.createStatement()) {
+                stmt.execute(createSaleTable);
+            }
+
+            // Créer la table orders si elle n'existe pas
+            String createOrdersTable = """
+                CREATE TABLE IF NOT EXISTS orders (
+                    id SERIAL PRIMARY KEY,
+                    reference VARCHAR(255) NOT NULL UNIQUE,
+                    creation_datetime TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                    payment_status payment_status NOT NULL DEFAULT 'UNPAID',
+                    id_sale INT UNIQUE NULL REFERENCES sale(id)
+                );
+                """;
+            
+            try (Statement stmt = conn.createStatement()) {
+                stmt.execute(createOrdersTable);
+            }
+
+            // Insérer les données de test si elles n'existent pas
+            String insertTestData = """
+                DO $$
+                BEGIN
+                    IF NOT EXISTS (SELECT 1 FROM sale WHERE id = 1) THEN
+                        INSERT INTO sale (id, creation_datetime) VALUES
+                        (1, '2024-01-15 12:30:00');
+                    END IF;
+
+                    IF NOT EXISTS (SELECT 1 FROM orders WHERE id = 1) THEN
+                        INSERT INTO orders (id, reference, creation_datetime, payment_status, id_sale) VALUES
+                        (1, '201', '2024-01-15 12:30:00', 'PAID', 1);
+                    END IF;
+
+                    IF NOT EXISTS (SELECT 1 FROM orders WHERE id = 2) THEN
+                        INSERT INTO orders (id, reference, creation_datetime, payment_status, id_sale) VALUES
+                        (2, '202', '2024-01-16 13:45:00', 'UNPAID', NULL);
+                    END IF;
+                END $$;
+                """;
+            
+            try (Statement stmt = conn.createStatement()) {
+                stmt.execute(insertTestData);
+            }
+
+        } catch (SQLException e) {
+            throw new RuntimeException("Erreur lors de l'initialisation de la base de données", e);
+        }
+    }
+
     public Order findOrderByReference(String reference) {
+        // Initialiser la base de données si nécessaire
+        initializeDatabaseIfNeeded();
+        
         String sql = """
                 SELECT
                     o.id as order_id,
@@ -218,6 +297,9 @@ public class DataRetriever {
     }
 
     public Order saveOrder(Order orderToSave) { // insérer ou mettre à jour une commande.
+        // Initialiser la base de données si nécessaire
+        initializeDatabaseIfNeeded();
+        
         if (orderToSave == null) {
             throw new IllegalArgumentException("orderToSave ne peut pas être null.");
         }
@@ -288,6 +370,9 @@ public class DataRetriever {
     }
 
     public Sale createSaleFrom(Order order) {
+        // Initialiser la base de données si nécessaire
+        initializeDatabaseIfNeeded();
+        
         if (order == null) {
             throw new IllegalArgumentException("order ne peut pas être null.");
         }
