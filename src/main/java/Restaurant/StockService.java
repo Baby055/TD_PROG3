@@ -4,7 +4,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-public final class StockService {
+public final class StockService { // Sert principalement à simuler ou appliquer des changements de stock
     private StockService() {}
 
     public static Map<String, Double> applyMovementsInKg(

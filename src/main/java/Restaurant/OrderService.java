@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 
-public final class OrderService {
+public final class OrderService { // Sert principalement à gérer les stocks lors de la création d'une commande.
     private final DataRetriever dataRetriever;
 
     public OrderService(DataRetriever dataRetriever) {
@@ -24,7 +24,7 @@ public final class OrderService {
             List<StockMovement> outMovements = new ArrayList<>();
 
             for (DishIngredient di : recipe) {
-                String ingredientName = dataRetriever.findIngredientNameById(di.getIngredientId());
+                String ingredientName = dataRetriever.findIngredientNameById(di.getIngredientId()); // ( DishIngrédient = ingrédient + quantité requise + unité).
                 double totalQty = di.getQuantityRequired() * numberOfDishes;
 
                 outMovements.add(new StockMovement(

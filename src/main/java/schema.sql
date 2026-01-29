@@ -1,6 +1,13 @@
 CREATE TYPE ingredient_category AS ENUM ('VEGETABLE', 'ANIMAL', 'MARINE', 'DAIRY', 'OTHER');
 CREATE TYPE dish_type_enum AS ENUM ('START', 'MAIN', 'DESSERT');
 
+DO $$
+BEGIN
+    CREATE TYPE payment_status AS ENUM ('PAID', 'UNPAID');
+EXCEPTION
+    WHEN duplicate_object THEN NULL;
+END $$;
+
 CREATE TABLE Dish (
     id SERIAL PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
@@ -18,4 +25,17 @@ CREATE TABLE Ingredient (
 
 ALTER TABLE Ingredient
 ADD COLUMN IF NOT EXISTS required_quantity NUMERIC NULL;
+
+CREATE TABLE IF NOT EXISTS sale (
+    id SERIAL PRIMARY KEY,
+    creation_datetime TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS orders (
+    id SERIAL PRIMARY KEY,
+    reference VARCHAR(255) NOT NULL UNIQUE,
+    creation_datetime TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    payment_status payment_status NOT NULL DEFAULT 'UNPAID',
+    id_sale INT UNIQUE NULL REFERENCES sale(id)
+);
 

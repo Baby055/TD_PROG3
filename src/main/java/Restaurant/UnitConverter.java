@@ -3,7 +3,7 @@ package Restaurant;
 import java.util.Locale;
 import java.util.Map;
 
-public final class UnitConverter {
+public final class UnitConverter { // Sert principalement à convertir des unités en kg
     private static final Map<String, IngredientUnitConversion> CONFIG_BY_INGREDIENT = Map.of(
             "tomate", new IngredientUnitConversion(10.0, 0.0),
             "laitue", new IngredientUnitConversion(2.0, 0.0),
