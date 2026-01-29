@@ -216,7 +216,7 @@ public class DataRetriever {
         }
     }
 
-    public Order saveOrder(Order orderToSave) {
+    public Order saveOrder(Order orderToSave) { // insérer ou mettre à jour une commande.
         if (orderToSave == null) {
             throw new IllegalArgumentException("orderToSave ne peut pas être null.");
         }
@@ -229,7 +229,7 @@ public class DataRetriever {
 
         Order existing = findOrderByReference(orderToSave.getReference());
 
-        if (existing != null && existing.getPaymentStatus() == PaymentStatusEnum.PAID) {
+        if (existing != null && existing.getPaymentStatus() == PaymentStatusEnum.PAID) { // - Si on tente de la réenregistrer identique → retourne l’existante (no-op).
             boolean isStrictNoOp =
                     orderToSave.getPaymentStatus() == PaymentStatusEnum.PAID
                             && (orderToSave.getId() == null || orderToSave.getId().equals(existing.getId()));
@@ -311,7 +311,7 @@ public class DataRetriever {
         String linkOrder = "UPDATE orders SET id_sale = ? WHERE reference = ?";
 
         try (Connection conn = DBConnection.getDBConnection()) {
-            conn.setAutoCommit(false);
+            conn.setAutoCommit(false); // Démarre une transaction
 
             Sale sale;
             try (PreparedStatement ps = conn.prepareStatement(insertSale)) {
