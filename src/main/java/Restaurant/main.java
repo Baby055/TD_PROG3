@@ -1,6 +1,10 @@
 package Restaurant;
 
+import java.time.LocalDateTime;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.ArrayList;
 
 public class main {
     public static void main(String[] args) {
@@ -53,6 +57,42 @@ public class main {
             }
         } catch (Exception e) {
             System.out.println("Erreur : " + e.getMessage());
+        }
+
+        // === BONUS K1 : Conversion d'unités (en mémoire) ===
+        System.out.println("\n=== BONUS K1 : Test conversion unités -> KG ===");
+
+        // Stock initial (KG) - selon l'énoncé
+        Map<String, Double> stockInitialKg = new LinkedHashMap<>();
+        stockInitialKg.put("Laitue", 5.0);
+        stockInitialKg.put("Tomate", 4.0);
+        stockInitialKg.put("Poulet", 10.0);
+        stockInitialKg.put("Chocolat", 3.0);
+        stockInitialKg.put("Beurre", 2.5);
+
+        // Nouveaux mouvements (tous OUT) - selon l'énoncé
+        List<StockMovement> movements = new ArrayList<>();
+        movements.add(new StockMovement(1, "Tomate", 5, UnitType.PCS, StockMovementType.OUT, "Préparation salade", LocalDateTime.now()));
+        movements.add(new StockMovement(2, "Laitue", 2, UnitType.PCS, StockMovementType.OUT, "Préparation salade", LocalDateTime.now()));
+        movements.add(new StockMovement(3, "Chocolat", 1, UnitType.L, StockMovementType.OUT, "Dessert", LocalDateTime.now()));
+        movements.add(new StockMovement(4, "Poulet", 4, UnitType.PCS, StockMovementType.OUT, "Plat principal", LocalDateTime.now()));
+        movements.add(new StockMovement(5, "Beurre", 1, UnitType.L, StockMovementType.OUT, "Pâtisserie", LocalDateTime.now()));
+
+        // Calcul des sorties en KG (pour affichage) + stock final
+        Map<String, Double> sortiesKg = new LinkedHashMap<>();
+        for (StockMovement m : movements) {
+            double kg = UnitConverter.toKg(m.getIngredientName(), m.getQuantity(), m.getUnit());
+            sortiesKg.merge(m.getIngredientName(), kg, Double::sum);
+        }
+        Map<String, Double> stockFinalKg = StockService.applyMovementsInKg(stockInitialKg, movements);
+
+        System.out.println("\nIngrédient | Stock avant (KG) | Sortie (KG) | Stock final (KG)");
+        for (Map.Entry<String, Double> e : stockInitialKg.entrySet()) {
+            String ing = e.getKey();
+            double before = e.getValue();
+            double outKg = sortiesKg.getOrDefault(ing, 0.0);
+            double after = stockFinalKg.getOrDefault(ing, before);
+            System.out.printf("%-9s | %-15.1f | %-10.1f | %-14.1f%n", ing, before, outKg, after);
         }
     }
 }

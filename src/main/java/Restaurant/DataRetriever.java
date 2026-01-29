@@ -159,4 +159,19 @@ public class DataRetriever {
             ps.executeUpdate();
         }
     }
+
+    public String findIngredientNameById(int ingredientId) throws SQLException {
+        String sql = "SELECT name FROM Ingredient WHERE id = ?";
+        try (Connection conn = DBConnection.getDBConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, ingredientId);
+            ResultSet rs = ps.executeQuery();
+            if (!rs.next()) {
+                throw new SQLException("Ingrédient introuvable (id=" + ingredientId + ")");
+            }
+            return rs.getString("name");
+        }
+    }
+
+
 }
